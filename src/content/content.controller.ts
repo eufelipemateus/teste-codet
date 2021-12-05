@@ -25,17 +25,19 @@ export class ContentController {
     @Body() createContentDto: CreateContentDto,
     @UploadedFile() file,
   ) {
-    console.error(createContentDto, file);
+   // console.error(createContentDto, file);
 
+   // Rename the file
     const myArray = file.originalname.split('.');
 
     const path0 = path.join(file.destination, file.filename);
 
     const path1 = path.join(file.destination, `${file.filename}.${myArray[1]}`);
 
-    console.log(path0, path1);
+    //console.log(path0, path1);
     fs.renameSync(path0, path1);
 
+    // prepare data
     const data = {
       title: createContentDto.title,
       year: createContentDto.year,
@@ -43,12 +45,16 @@ export class ContentController {
       file: path1,
     } as unknown as Content;
     try {
+      // Save Contend in db
       const content = await this.contentService.create(data);
+      console.log(content)
 
-      // content.public_url = `${process.env.APP_URL}/view/${content.id}`;
-      content.public_url = `https://localhost:3000/view/${content.id}`;
-
+      // Put file url
+      content.public_url = `${process.env.APP_URL}/view/${content.id}`;
+      //content.public_url = `https://localhost:3000/view/${content.id}`;
       const dbContent = await this.contentService.update(content.id, content);
+
+      console.log(dbContent)
 
       return dbContent;
     } catch (e) {
@@ -64,7 +70,6 @@ export class ContentController {
   @Get('/view/:id')
   async getVideo(@Param('id') id: string) {
     const content = await this.contentService.findOne(id);
-
     return fs.readFileSync(content.file);
   }
 }
