@@ -27,6 +27,10 @@ export class content1638546087988 implements MigrationInterface {
             name: 'file',
             type: 'text',
           },
+          {
+            name: 'public_url',
+            type: 'text',
+          }
         ],
       }),
       true,
