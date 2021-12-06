@@ -12,7 +12,7 @@ export class ContentsService {
   ) {}
 
   create(content: Content) {
-    return this.contentsRepository.create(content);
+    return this.contentsRepository.save(content);
   }
 
   findAll(): Promise<Content[]> {
@@ -25,7 +25,7 @@ export class ContentsService {
 
   async update(id: number, data: Content): Promise<Content> {
     await this.contentsRepository.update({ id }, data);
-    return this.contentsRepository.findOne({ id });
+    return this.contentsRepository.findOne( id );
   }
 
   async remove(id: string): Promise<void> {

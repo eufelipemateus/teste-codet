@@ -4,8 +4,10 @@ import {
   Get,
   Param,
   Post,
+  Res,
   UploadedFile,
   UseInterceptors,
+  Response,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Content } from '../entity/content.entity';
@@ -24,6 +26,7 @@ export class ContentController {
   async create(
     @Body() createContentDto: CreateContentDto,
     @UploadedFile() file,
+    @Res() response,
   ) {
    // console.error(createContentDto, file);
 
@@ -43,22 +46,23 @@ export class ContentController {
       year: createContentDto.year,
       duration: createContentDto.duration,
       file: path1,
+      file_type: file.mimetype,
+      public_url: '',
     } as unknown as Content;
     try {
       // Save Contend in db
       const content = await this.contentService.create(data);
-      console.log(content)
+      // console.log(content)
 
       // Put file url
-      content.public_url = `${process.env.APP_URL}/view/${content.id}`;
+      content.public_url = `${process.env.APP_URL}/content/view/${content.id}`;
       //content.public_url = `https://localhost:3000/view/${content.id}`;
       const dbContent = await this.contentService.update(content.id, content);
 
-      console.log(dbContent)
-
-      return dbContent;
+      // console.log(dbContent)
+      return response.status(200).json(dbContent)
     } catch (e) {
-      return 'Error ao tentar salvar';
+      return response.status(500).json('Error ao tentar salvar');
     }
   }
 
@@ -68,8 +72,19 @@ export class ContentController {
   }
 
   @Get('/view/:id')
-  async getVideo(@Param('id') id: string) {
+  async getVideo(@Param('id') id: string, @Res() res) {
     const content = await this.contentService.findOne(id);
-    return fs.readFileSync(content.file);
+
+    // name to donwload
+    const arrayFile = content.file.split('.');
+    const myName = `content-${content.id}.${arrayFile[1]}`
+
+    // type file
+    res.set("Content-Type", content.file_type);
+    //res.set('Content-Disposition', `attachment; filename=${myName}`)
+
+    const file = fs.createReadStream(content.file);
+    file.pipe(res);
+
   }
 }

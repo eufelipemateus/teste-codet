@@ -3,11 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { ContentModule } from './content/content.module';
 
-/*
-import { ContentController } from './controllers/content.controller';
-import { ContentsService } from './services/content/content';
-*/
-// import { Content } from './entity/content.entity';
 
 @Module({
   imports: [
@@ -15,11 +10,11 @@ import { ContentsService } from './services/content/content';
     TypeOrmModule.forRootAsync({
       useFactory: () => ({
         type: 'mysql',
-        host: 'uyu7j8yohcwo35j3.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',
+        host: process.env.DB_HOST,
         port: 3306,
-        username: 's0vurz0ljyewe5dc',
-        password: 'doy2ghlcqnfsggfz',
-        database: 'md22lga4oy6r8ho9',
+        username: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: false,
       }),
